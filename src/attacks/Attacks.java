@@ -23,7 +23,11 @@ public class Attacks {
 	int randomChoice;
 	
 	public Attacks(){
-		for(int i = 0; i < 4; i++){
+		generateAttacks(0);
+	}
+	
+	private void generateAttacks(int startingPoint){
+		for(int i = startingPoint; i < 4; i++){
 			do{
 				randomChoice = rand.nextInt(19);
 			}while(Arrays.asList(choice).contains("" + randomChoice));
@@ -39,10 +43,9 @@ public class Attacks {
 	 * assign a certain moveset to a character
 	 */
 	public void assignCharacterAttacks(int...attackChoices){
-		int i[] = attackChoices;
 		int counter = 0;
 		
-		for(int j : i){
+		for(int j : attackChoices){
 			if(counter < 4){
 				attackChoice[counter] = Attacks[j];
 				attackPowerList[counter] = AttackPower[j];
@@ -50,6 +53,7 @@ public class Attacks {
 				counter++;
 			}
 		}
+		generateAttacks(attackChoices.length);
 	}
 	
 	/**
@@ -118,8 +122,8 @@ public class Attacks {
 				AttackDialog = (Attackername + ": YEAAAAAAHHHHHH, LET'S THROW A SHITLOAD OF CHOCOLATE IN THAT FACE OF YOURS!!! MUHHAHAHAH");
 				break;
 			case 17:
-				AttackDialog = (": Looks like i'll be using my final move \n"
-						+ "Killer Move: Serious Series.....\n.....Serious Punch");
+				AttackDialog = ("\"Looks like i'll be using my final move \n"
+						+ "Killer Move: Serious Series.....\n.....Serious Punch\"");
 				break;
 			case 18:
 				AttackDialog = ("\"I WILL DEFEAT YOU!!!!! \nALL OF MY ENERGY WILL BE RELEASED, BLASTING YOU AND THIS PLANET TO HELL!!!!!!!!!!!\n"

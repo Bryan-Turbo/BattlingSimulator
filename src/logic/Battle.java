@@ -3,9 +3,10 @@ package logic;
 import attacks.*;
 import characters.*;
 import data.*;
+import globals.*;
 import java.util.*;
 
-public class Battle extends Base{
+public class Battle extends BattleMethodsReuse{
 	Damage damg = new Damage();
 	
 	Attacks attack = new Attacks();
@@ -13,28 +14,41 @@ public class Battle extends Base{
 	Random rand = new Random();
 	
 	boolean canAttack = true;
-	boolean Battling = false;
+	boolean Battling = true;
 	
-	public void startBattle(character Attacker, character Defender){
-		getNames(Attacker, Defender);
-		printCharacterBasicStats(Attacker, Defender);
-		battle(Attacker, Defender);
+	public void startBattle(character Player, character Enemy){
+		getNames(Player, Enemy);
+		printCharacterBasicStats(Player, Enemy);
+		battle(Player, Enemy);
 	}
 
-	private void battle(character Attacker, character Defender){
-		chooseAttack(Attacker, Defender);
+	private void battle(character Player, character Enemy){
+		int attackInt;
+		while(Battling){
+			if(canAttack){
+				attackInt = chooseAttack(Player, Enemy);
+				processDamageValues(Player, Enemy, attackInt);
+				canAttack = false;
+			}else{
+				attackInt = chooseAttack(Enemy, Player);
+				processDamageValues(Enemy, Player, attackInt);
+				canAttack = true;
+			}
+			
+		}
 	}
 	
-	private void chooseAttack(character Attacker, character Defender){
-		System.out.println("Choose your attack by entering the visible indexes.\n");
-		showAttackerMoves(Attacker);
-		while(true){
-			System.out.println(Defender.lifePoints);
-			int attackIndex = getAttack(Attacker);
-			printAttackDialog(Attacker, Defender, attackIndex);
-			int Damage = damg.calcDamage(Attacker.Power, Defender.Defense, attack.getAttackPower(attackIndex));
-			Defender.lifePoints -= Damage;
+	private int chooseAttack(character Attacker, character Defender){
+		int attackIndex = 0;
+		if(Attacker.type.equals("PLAYER")){
+			System.out.println("Choose your attack by entering the visible indexes.\n");
+			showMoves(Attacker);
+			attackIndex = getAttack(Attacker);
+		}else{
+			attackIndex = Attacker.AttackIndex[rand.nextInt(4)];
 		}
+		printAttackDialog(Attacker, Defender, attack.getAttackDialog(Attacker.name, Defender.name, attackIndex));
+		return attackIndex;
 	}
 	
 	private int getAttack(character Attacker){
@@ -58,23 +72,18 @@ public class Battle extends Base{
 		}
 	}
 	
-	private void showAttackerMoves(character Attacker){
-		String attacks = "";
-		for(int i = 0; i < Attacker.Attacks.length; i++){
-			attacks += "INDEX: "+Attacker.AttackIndex[i]+"\tPOWER: "+Attacker.AttackPower[i]+"\t"+Attacker.Attacks[i]+"\n";
-		}
-		System.out.println(attacks);
-	}
-	
-	private void printAttackDialog(character Attacker, character Defender, int AttackIndex){
-		String attackDialog = attack.getAttackDialog(Attacker.name, Defender.name, AttackIndex);
-		
+	private void printAttackDialog(character Attacker, character Defender, String attackDialog){
 		for(char letter : attackDialog.toCharArray()){
 			System.out.print(letter);
 			sleep(0.05);
 		}
 		canAttack = true;
 		System.out.println();
+	}
+	
+	private void processDamageValues(character Attacker, character Defender, int attackNumber){
+		int Damage = damg.calcDamage(Attacker.Power, Defender.Defense, attack.getAttackPower(attackNumber));
+		Defender.lifePoints = Defender.lifePoints - Damage;
 	}
 	
 	private void printCharacterBasicStats(character Attacker, character Defender) {
